@@ -78,7 +78,7 @@
                             <h3 class="font-extrabold text-slate-900 text-xl mb-3 line-clamp-1">{{ $paket->nama_paket }}</h3>
                             
                             <div class="flex items-center gap-4 text-sm text-slate-600 mb-5 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> {{ $paket->durasi }} Hari</span>
+                                <span class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> {{ $paket->durasi_hari }} Hari</span>
                                 <span class="text-slate-300">|</span>
                                 <span class="flex items-center gap-2"><i class="fas fa-user-friends text-slate-400"></i> Min {{ $paket->min_peserta }} Pax</span>
                             </div>
@@ -89,7 +89,7 @@
                         <div class="flex justify-between items-end border-t border-slate-100 pt-5">
                             <div>
                                 <p class="text-xs text-slate-400 font-medium mb-0.5">Harga per pax</p>
-                                <p class="font-black text-blue-700 text-xl">Rp {{ number_format($paket->harga ?? 0, 0, ',', '.') }}</p>
+                                <p class="font-black text-blue-700 text-xl">{{ $paket->harga_format }}</p>
                             </div>
                             
                             <a href="{{ route('paket.show', $paket->id) }}" class="bg-blue-50 border border-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm">

@@ -112,14 +112,23 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // 🔥 LOGIKA PENENTU ARAH (PASTIKAN BAGIAN INI ADA) 🔥
-            if (Auth::user()->role === 'admin') {
-                // Lempar ke admin
-                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang Admin!');
+            $user = Auth::user();
+            $intended = session()->get('url.intended');
+
+            // 🔥 LOGIKA PENENTU ARAH YANG AMAN UNTUK MULTI-ROLE 🔥
+            if ($user->role === 'admin') {
+                // Admin tidak boleh dialihkan ke halaman customer-only
+                if ($intended && str_contains($intended, '/customer')) {
+                    session()->forget('url.intended');
+                }
+                return redirect()->intended(route('admin.dashboard'))->with('success', 'Selamat datang Admin!');
             }
 
-            // Lempar ke customer
-            return redirect()->route('customer.dashboard')->with('success', 'Login Berhasil!');
+            // Customer tidak boleh dialihkan ke halaman admin-only
+            if ($intended && str_contains($intended, '/admin')) {
+                session()->forget('url.intended');
+            }
+            return redirect()->intended(route('customer.dashboard'))->with('success', 'Login Berhasil!');
         }
 
         return back()->withErrors([

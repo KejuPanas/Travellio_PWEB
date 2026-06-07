@@ -11,11 +11,13 @@
     </div>
 
     {{-- Tabs Status --}}
-    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <button class="bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold shadow-sm whitespace-nowrap">Semua (4)</button>
-        <button class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Pending (1)</button>
-        <button class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Konfirmasi (2)</button>
-        <button class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Selesai (1)</button>
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2" id="status-tabs">
+        <button data-status="all" class="tab-btn bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold shadow-sm whitespace-nowrap">Semua ({{ $bookings->count() }})</button>
+        <button data-status="Pending" class="tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Pending ({{ $bookings->where('status', 'Pending')->count() }})</button>
+        <button data-status="Dikonfirmasi" class="tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Dikonfirmasi ({{ $bookings->where('status', 'Dikonfirmasi')->count() }})</button>
+        <button data-status="Berlangsung" class="tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Berlangsung ({{ $bookings->where('status', 'Berlangsung')->count() }})</button>
+        <button data-status="Selesai" class="tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Selesai ({{ $bookings->where('status', 'Selesai')->count() }})</button>
+        <button data-status="Ditolak" class="tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap">Ditolak ({{ $bookings->where('status', 'Ditolak')->count() }})</button>
     </div>
 
     {{-- Tabel Riwayat --}}
@@ -32,107 +34,75 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
-                    
-                    {{-- Row: Pending --}}
-                    <tr class="hover:bg-slate-50 transition">
+                    @forelse($bookings as $booking)
+                    <tr class="booking-row hover:bg-slate-50 transition" data-status="{{ $booking->status }}">
                         <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plane-departure"></i></div>
+                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-plane-departure"></i>
+                            </div>
                             <div>
-                                <p class="font-bold text-slate-900">Liburan Bali - Seminyak</p>
-                                <p class="text-xs text-slate-400">#VE-90123-ID</p>
+                                <p class="font-bold text-slate-900">{{ optional($booking->paketWisata)->nama_paket ?? 'Paket Terhapus' }}</p>
+                                <p class="text-xs text-slate-400">{{ $booking->kode_booking }}</p>
                             </div>
                         </td>
-                        <td class="p-4 text-slate-600">15 Okt - 20 Okt 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Menunggu</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 12.500.000</td>
+                        <td class="p-4 text-slate-600">{{ $booking->tanggal_berangkat->format('d M Y') }}</td>
+                        <td class="p-4">
+                            @php
+                                $badgeClass = match($booking->status) {
+                                    'Pending' => 'bg-yellow-100 text-yellow-700',
+                                    'Dikonfirmasi' => 'bg-green-100 text-green-700',
+                                    'Berlangsung' => 'bg-blue-100 text-blue-700',
+                                    'Selesai' => 'bg-slate-100 text-slate-700',
+                                    'Ditolak' => 'bg-red-100 text-red-700',
+                                    default => 'bg-slate-100 text-slate-700'
+                                };
+                            @endphp
+                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase {{ $badgeClass }}">{{ $booking->status }}</span>
+                        </td>
+                        <td class="p-4 font-bold text-slate-900">{{ $booking->total_harga_format }}</td>
                         <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
+                            <a href="{{ route('customer.bookings.show', $booking->id) }}" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg inline-flex items-center"><i class="fas fa-eye"></i></a>
                         </td>
                     </tr>
-
-                                        <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plane-departure"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-900">Liburan Bali - Seminyak</p>
-                                <p class="text-xs text-slate-400">#VE-90123-ID</p>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600">15 Okt - 20 Okt 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Menunggu</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 12.500.000</td>
-                        <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
-                        </td>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-slate-400">Belum ada riwayat pemesanan.</td>
                     </tr>
-
-                                        <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plane-departure"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-900">Liburan Bali - Seminyak</p>
-                                <p class="text-xs text-slate-400">#VE-90123-ID</p>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600">15 Okt - 20 Okt 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Menunggu</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 12.500.000</td>
-                        <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
-                        </td>
-                    </tr>
-
-                                        <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plane-departure"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-900">Liburan Bali - Seminyak</p>
-                                <p class="text-xs text-slate-400">#VE-90123-ID</p>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600">15 Okt - 20 Okt 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Menunggu</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 12.500.000</td>
-                        <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
-                        </td>
-                    </tr>
-
-                                        <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plane-departure"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-900">Liburan Bali - Seminyak</p>
-                                <p class="text-xs text-slate-400">#VE-90123-ID</p>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600">15 Okt - 20 Okt 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Menunggu</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 12.500.000</td>
-                        <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
-                        </td>
-                    </tr>
-
-                    {{-- Row: Konfirmasi --}}
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center"><i class="fas fa-map-marked-alt"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-900">Petualangan Raja Ampat</p>
-                                <p class="text-xs text-slate-400">#VE-88421-ID</p>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600">02 Des - 10 Des 2024</td>
-                        <td class="p-4"><span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Terkonfirmasi</span></td>
-                        <td class="p-4 font-bold text-slate-900">Rp 25.750.000</td>
-                        <td class="p-4 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('#status-tabs .tab-btn');
+        const rows = document.querySelectorAll('tbody tr.booking-row');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Reset active tab
+                tabs.forEach(t => {
+                    t.classList.remove('bg-blue-700', 'text-white');
+                    t.classList.add('bg-white', 'border', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-50');
+                });
+
+                // Set active tab
+                tab.classList.remove('bg-white', 'border', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-50');
+                tab.classList.add('bg-blue-700', 'text-white');
+
+                const status = tab.getAttribute('data-status');
+
+                rows.forEach(row => {
+                    if (status === 'all' || row.getAttribute('data-status') === status) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

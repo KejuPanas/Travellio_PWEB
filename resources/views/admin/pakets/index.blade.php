@@ -16,14 +16,16 @@
         {{-- Toolbar --}}
         <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex gap-2">
-                <button class="bg-blue-700 text-white px-4 py-1.5 rounded-full text-sm font-bold">Semua Paket (24)</button>
-                <button class="text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-sm font-bold">Aktif (18)</button>
-                <button class="text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-sm font-bold">Non-aktif (6)</button>
+                <a href="{{ route('admin.pakets.index', ['status' => 'semua', 'search' => request('search')]) }}" class="{{ $status === 'semua' ? 'bg-blue-700 text-white' : 'text-slate-600 hover:bg-slate-50' }} px-4 py-1.5 rounded-full text-sm font-bold">Semua Paket ({{ $totalSemua }})</a>
+                <a href="{{ route('admin.pakets.index', ['status' => 'aktif', 'search' => request('search')]) }}" class="{{ $status === 'aktif' ? 'bg-blue-700 text-white' : 'text-slate-600 hover:bg-slate-50' }} px-4 py-1.5 rounded-full text-sm font-bold">Aktif ({{ $totalAktif }})</a>
+                <a href="{{ route('admin.pakets.index', ['status' => 'non-aktif', 'search' => request('search')]) }}" class="{{ $status === 'non-aktif' ? 'bg-blue-700 text-white' : 'text-slate-600 hover:bg-slate-50' }} px-4 py-1.5 rounded-full text-sm font-bold">Non-aktif ({{ $totalNonAktif }})</a>
             </div>
-            <div class="relative w-full sm:w-64">
+            
+            <form action="{{ route('admin.pakets.index') }}" method="GET" class="relative w-full sm:w-64">
+                <input type="hidden" name="status" value="{{ $status }}">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" placeholder="Cari nama, lokasi..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-600 outline-none">
-            </div>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, lokasi..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+            </form>
         </div>
 
         {{-- Table --}}
@@ -38,70 +40,63 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm">
+                    @forelse ($pakets as $paket)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-4 flex items-center gap-4">
-                            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=100&q=80" class="w-14 h-14 rounded-lg object-cover">
+                            <img src="{{ $paket->foto_url }}" class="w-14 h-14 rounded-lg object-cover {{ !$paket->is_active ? 'grayscale' : '' }}">
                             <div>
-                                <p class="font-bold text-slate-900 text-base">Eksplorasi Bali Tropis 4H3M</p>
-                                <p class="text-xs text-slate-500 mt-0.5"><i class="fas fa-map-marker-alt text-slate-400"></i> Bali, Indonesia</p>
+                                <p class="font-bold text-slate-900 text-base">{{ $paket->nama_paket }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5"><i class="fas fa-map-marker-alt text-slate-400"></i> {{ $paket->destinasi }} ({{ $paket->durasi_hari }} Hari)</p>
                             </div>
                         </td>
                         <td class="p-4">
-                            <p class="font-bold text-slate-900 text-base">Rp 4.500.000</p>
-                            <p class="text-xs text-slate-500 mt-0.5">Diskon 10% aktif</p>
+                            <p class="font-bold text-slate-900 text-base">{{ $paket->harga_format }}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">{{ $paket->min_peserta }} - {{ $paket->max_peserta ?? 'Tak terbatas' }} pax</p>
                         </td>
                         <td class="p-4">
                             <div class="flex items-center gap-2">
-                                <div class="w-10 h-5 bg-blue-600 rounded-full relative cursor-pointer">
+                                @if($paket->is_active)
+                                <div class="w-10 h-5 bg-blue-600 rounded-full relative cursor-default">
                                     <div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5"></div>
                                 </div>
                                 <span class="text-blue-600 font-bold text-xs">Aktif</span>
-                            </div>
-                        </td>
-                        <td class="p-4 text-center">
-                            <a href="{{ route('admin.pakets.edit', 1) }}" class="text-slate-400 hover:text-blue-600 mx-1 inline-block"><i class="fas fa-edit"></i></a>
-                            <button class="text-slate-400 hover:text-red-600 mx-1"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 flex items-center gap-4">
-                            <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=100&q=80" class="w-14 h-14 rounded-lg object-cover grayscale">
-                            <div>
-                                <p class="font-bold text-slate-900 text-base">City Tour Tokyo 5H4M</p>
-                                <p class="text-xs text-slate-500 mt-0.5"><i class="fas fa-map-marker-alt text-slate-400"></i> Tokyo, Japan</p>
-                            </div>
-                        </td>
-                        <td class="p-4">
-                            <p class="font-bold text-slate-900 text-base">Rp 12.500.000</p>
-                            <p class="text-xs text-slate-500 mt-0.5">Habis Terjual</p>
-                        </td>
-                        <td class="p-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-10 h-5 bg-slate-200 rounded-full relative cursor-pointer">
+                                @else
+                                <div class="w-10 h-5 bg-slate-200 rounded-full relative cursor-default">
                                     <div class="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
                                 </div>
                                 <span class="text-slate-400 font-bold text-xs">Non-aktif</span>
+                                @endif
                             </div>
                         </td>
                         <td class="p-4 text-center">
-                            <a href="{{ route('admin.pakets.edit', 1) }}" class="text-slate-400 hover:text-blue-600 mx-1 inline-block"><i class="fas fa-edit"></i></a>
-                            <button class="text-slate-400 hover:text-red-600 mx-1"><i class="fas fa-trash"></i></button>
+                            <a href="{{ route('admin.pakets.edit', $paket->id) }}" class="text-slate-400 hover:text-blue-600 mx-1 inline-block"><i class="fas fa-edit"></i></a>
+                            
+                            @if($paket->is_active)
+                            <form action="{{ route('admin.pakets.destroy', $paket->id) }}" method="POST" class="inline-block m-0" onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan paket ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-slate-400 hover:text-red-600 mx-1"><i class="fas fa-trash"></i></button>
+                            </form>
+                            @endif
                         </td>
                     </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-slate-500">
+                            Tidak ada paket wisata yang ditemukan.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         
-        {{-- Pagination Placeholder --}}
-        <div class="p-4 border-t border-slate-100 flex justify-between items-center text-sm text-slate-500">
-            <span>Menampilkan 1-3 dari 24 paket</span>
-            <div class="flex gap-1">
-                <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">&lt;</button>
-                <button class="px-3 py-1 bg-blue-700 text-white rounded">1</button>
-                <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">2</button>
-                <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">&gt;</button>
-            </div>
+        {{-- Pagination --}}
+        @if($pakets->hasPages())
+        <div class="p-4 border-t border-slate-100">
+            {{ $pakets->links() }}
         </div>
+        @endif
     </div>
 </div>
 @endsection

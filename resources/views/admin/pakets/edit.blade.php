@@ -9,11 +9,11 @@
     </a>
     <div>
         <h1 class="text-3xl font-bold text-slate-900">Edit Paket Wisata</h1>
-        <p class="text-slate-500 mt-1 text-sm">Eksplorasi Bali Tropis 4H3M</p>
+        <p class="text-slate-500 mt-1 text-sm">{{ $paket->nama_paket }}</p>
     </div>
 
-    {{-- Form Utama (Perhatikan @method('PUT') di bawah @csrf) --}}
-    <form action="#" method="POST" enctype="multipart/form-data" class="space-y-6 mt-8">
+    {{-- Form Utama --}}
+    <form action="{{ route('admin.pakets.update', $paket->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6 mt-8">
         @csrf
         @method('PUT')
 
@@ -24,32 +24,38 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Nama paket <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama_paket" required value="Eksplorasi Bali Tropis 4H3M" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                    <input type="text" name="nama_paket" required value="{{ old('nama_paket', $paket->nama_paket) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                    @error('nama_paket') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Destinasi <span class="text-red-500">*</span></label>
-                        <input type="text" name="destinasi" required value="Bali, Indonesia" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        <input type="text" name="destinasi" required value="{{ old('destinasi', $paket->destinasi) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        @error('destinasi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Harga per orang (Rp) <span class="text-red-500">*</span></label>
-                        <input type="number" name="harga" required value="4500000" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        <input type="number" name="harga" required value="{{ old('harga', intval($paket->harga_per_orang)) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        @error('harga') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Durasi (hari) <span class="text-red-500">*</span></label>
-                        <input type="number" name="durasi" required value="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        <input type="number" name="durasi" required value="{{ old('durasi', $paket->durasi_hari) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        @error('durasi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Min. peserta <span class="text-red-500">*</span></label>
-                        <input type="number" name="min_peserta" required value="2" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        <input type="number" name="min_peserta" required value="{{ old('min_peserta', $paket->min_peserta) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        @error('min_peserta') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Maks. peserta</label>
-                        <input type="number" name="maks_peserta" value="15" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        <input type="number" name="maks_peserta" value="{{ old('maks_peserta', $paket->max_peserta) }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">
+                        @error('maks_peserta') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -62,12 +68,14 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi <span class="text-red-500">*</span></label>
-                    <textarea name="deskripsi" required rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">Nikmati keindahan pantai Bali dan budaya eksotisnya dengan paket liburan lengkap kami yang sudah termasuk penginapan dan transportasi.</textarea>
+                    <textarea name="deskripsi" required rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">{{ old('deskripsi', $paket->deskripsi) }}</textarea>
+                    @error('deskripsi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Itinerary <span class="text-red-500">*</span></label>
-                    <textarea name="itinerary" required rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">Hari 1: Penjemputan di Bandara & Check-in Hotel&#10;Hari 2: Watersport di Tanjung Benoa & Uluwatu Sunset&#10;Hari 3: Eksplorasi Ubud & Monkey Forest&#10;Hari 4: Belanja Oleh-oleh & Drop Bandara</textarea>
+                    <textarea name="itinerary" required rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition-colors text-sm">{{ old('itinerary', $paket->itinerary) }}</textarea>
+                    @error('itinerary') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>
@@ -81,14 +89,15 @@
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Foto destinasi saat ini</label>
                     <div class="flex items-center gap-4 mb-3">
-                        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=200&q=80" class="w-20 h-20 rounded-lg object-cover border border-slate-200">
+                        <img src="{{ $paket->foto_url }}" class="w-20 h-20 rounded-lg object-cover border border-slate-200">
                         <p class="text-xs text-slate-500">Abaikan jika tidak ingin mengubah foto.</p>
                     </div>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-6 flex flex-col items-center justify-center text-center hover:bg-slate-100 transition-colors cursor-pointer">
+                    <label class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-6 flex flex-col items-center justify-center text-center hover:bg-slate-100 transition-colors cursor-pointer w-full">
                         <i class="fas fa-upload text-xl text-slate-400 mb-2"></i>
                         <p class="text-xs font-bold text-slate-700">Ganti foto baru (Opsional)</p>
-                        <input type="file" name="foto" class="hidden">
-                    </div>
+                        <input type="file" name="foto" class="hidden" accept="image/jpeg, image/png, image/webp">
+                    </label>
+                    @error('foto') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 {{-- Status Toggle --}}
@@ -96,7 +105,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">Status paket</label>
                     <div class="flex items-start gap-3 mt-2">
                         <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                            <input type="checkbox" name="status" value="aktif" class="sr-only peer" checked>
+                            <input type="checkbox" name="status" value="aktif" class="sr-only peer" {{ old('status', $paket->is_active ? 'aktif' : '') == 'aktif' ? 'checked' : '' }}>
                             <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </label>
                         <div>

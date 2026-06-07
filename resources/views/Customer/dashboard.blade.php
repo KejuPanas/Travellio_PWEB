@@ -13,17 +13,17 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
             <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fas fa-ticket-alt"></i></div>
             <p class="text-slate-500 text-sm font-medium">Total Pesanan</p>
-            <h3 class="text-3xl font-bold text-slate-900">12</h3>
+            <h3 class="text-3xl font-bold text-slate-900">{{ $totalBookings }}</h3>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
             <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fas fa-clock"></i></div>
             <p class="text-slate-500 text-sm font-medium">Menunggu Konfirmasi</p>
-            <h3 class="text-3xl font-bold text-slate-900">2</h3>
+            <h3 class="text-3xl font-bold text-slate-900">{{ $pendingBookings }}</h3>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
             <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fas fa-check-circle"></i></div>
             <p class="text-slate-500 text-sm font-medium">Perjalanan Selesai</p>
-            <h3 class="text-3xl font-bold text-slate-900">10</h3>
+            <h3 class="text-3xl font-bold text-slate-900">{{ $completedBookings }}</h3>
         </div>
     </div>
 
@@ -44,27 +44,42 @@
                             <th class="pb-3 font-semibold">Tanggal</th>
                             <th class="pb-3 font-semibold">Status</th>
                             <th class="pb-3 font-semibold">Total</th>
+                            <th class="pb-3 font-semibold text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm">
-                        <tr class="border-b border-slate-50 last:border-0">
+                        @forelse($latestBookings as $booking)
+                        <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
                             <td class="py-4 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-slate-200 overflow-hidden"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=100&q=80" class="w-full h-full object-cover"></div>
-                                <span class="font-bold text-slate-900">Bali Getaway</span>
+                                <div class="w-10 h-10 rounded-lg bg-slate-200 overflow-hidden flex-shrink-0">
+                                    <img src="{{ optional($booking->paketWisata)->foto_url ?? asset('images/default-destination.jpg') }}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-bold text-slate-900">{{ optional($booking->paketWisata)->nama_paket ?? 'Paket Terhapus' }}</span>
                             </td>
-                            <td class="py-4 text-slate-500">15 Okt 2024</td>
-                            <td class="py-4"><span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">TERKONFIRMASI</span></td>
-                            <td class="py-4 font-bold text-blue-600">Rp 4.500.000</td>
+                            <td class="py-4 text-slate-500">{{ $booking->tanggal_berangkat->format('d M Y') }}</td>
+                            <td class="py-4">
+                                @php
+                                    $badgeClass = match($booking->status) {
+                                        'Pending' => 'bg-yellow-100 text-yellow-700',
+                                        'Dikonfirmasi' => 'bg-green-100 text-green-700',
+                                        'Berlangsung' => 'bg-blue-100 text-blue-700',
+                                        'Selesai' => 'bg-slate-100 text-slate-700',
+                                        'Ditolak' => 'bg-red-100 text-red-700',
+                                        default => 'bg-slate-100 text-slate-700'
+                                    };
+                                @endphp
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase {{ $badgeClass }}">{{ $booking->status }}</span>
+                            </td>
+                            <td class="py-4 font-bold text-blue-600">{{ $booking->total_harga_format }}</td>
+                            <td class="py-4 text-right">
+                                <a href="{{ route('customer.bookings.show', $booking->id) }}" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></a>
+                            </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="py-4 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-slate-200 overflow-hidden"><img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=100&q=80" class="w-full h-full object-cover"></div>
-                                <span class="font-bold text-slate-900">Kyoto Spring</span>
-                            </td>
-                            <td class="py-4 text-slate-500">12 Nov 2024</td>
-                            <td class="py-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">MENUNGGU</span></td>
-                            <td class="py-4 font-bold text-blue-600">Rp 12.800.000</td>
+                            <td colspan="5" class="py-8 text-center text-slate-400">Belum ada pesanan terbaru.</td>
                         </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

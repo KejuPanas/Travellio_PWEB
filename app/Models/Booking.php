@@ -17,6 +17,8 @@ class Booking extends Model
         'tanggal_berangkat',
         'jumlah_peserta',
         'total_harga',
+        'nominal_dp',
+        'bukti_transfer',
         'catatan',
         'status',
         'alasan_tolak',
@@ -27,6 +29,7 @@ class Booking extends Model
     protected $casts = [
         'tanggal_berangkat' => 'date',
         'total_harga' => 'decimal:2',
+        'nominal_dp' => 'decimal:2',
         'pembayaran_diterima' => 'boolean',
         'pembayaran_diterima_at' => 'datetime',
     ];
@@ -53,6 +56,29 @@ class Booking extends Model
     public function getTotalHargaFormatAttribute(): string
     {
         return 'Rp ' . number_format($this->total_harga, 0, ',', '.');
+    }
+
+    public function getNominalDpFormatAttribute(): string
+    {
+        return 'Rp ' . number_format($this->nominal_dp, 0, ',', '.');
+    }
+
+    public function getBuktiTransferUrlAttribute(): string
+    {
+        if ($this->bukti_transfer) {
+            return asset('storage/' . $this->bukti_transfer);
+        }
+        return '';
+    }
+
+    public function getSisaPelunasanAttribute(): float
+    {
+        return (float) ($this->total_harga - $this->nominal_dp);
+    }
+
+    public function getSisaPelunasanFormatAttribute(): string
+    {
+        return 'Rp ' . number_format($this->sisa_pelunasan, 0, ',', '.');
     }
 
     public function getStatusBadgeAttribute(): string

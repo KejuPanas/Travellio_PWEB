@@ -46,69 +46,55 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {{-- Loop data $pakets Anda di sini (Ini contoh statis sesuai gambar) --}}
-            
-            {{-- Card 1 --}}
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition p-3">
-                <div class="relative h-48 rounded-xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
-                    <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md">Best Seller</span>
+            @forelse($pakets as $paket)
+            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition p-3 flex flex-col justify-between">
+                <div>
+                    <a href="{{ route('paket.show', $paket->id) }}" class="block relative h-48 rounded-xl overflow-hidden group">
+                        <img src="{{ $paket->foto_url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">Best Seller</span>
+                    </a>
+                    <div class="p-4">
+                        <div class="text-slate-400 text-xs flex items-center gap-1 mb-1.5">
+                            <i class="fas fa-location-dot text-blue-600"></i> {{ $paket->destinasi }}
+                        </div>
+                        <h3 class="font-bold text-slate-800 mb-4 line-clamp-2 h-12 leading-snug hover:text-blue-600 transition-colors">
+                            <a href="{{ route('paket.show', $paket->id) }}">{{ $paket->nama_paket }}</a>
+                        </h3>
+                        <p class="text-xs text-slate-500 flex items-center gap-2 mb-4">
+                            <i class="far fa-clock"></i> {{ $paket->durasi_hari }} Hari
+                        </p>
+                    </div>
                 </div>
-                <div class="p-4">
-                    <div class="text-gray-400 text-xs flex items-center gap-1 mb-1"><i class="fas fa-location-dot"></i> Bali, Indonesia</div>
-                    <h3 class="font-bold text-gray-900 mb-4 line-clamp-2">Eksplorasi Uluwatu & Ubud</h3>
-                    <div class="flex justify-between items-center mt-auto">
-                        <div class="text-blue-700 font-bold text-lg">Rp 4.5Jt</div>
-                        <button class="bg-gray-100 hover:bg-gray-200 text-blue-700 text-xs font-semibold py-2 px-4 rounded-lg transition">Pesan Sekarang</button>
+                <div class="p-4 pt-0">
+                    <div class="flex justify-between items-center mt-auto border-t border-slate-50 pt-4">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mulai dari</p>
+                            <p class="text-blue-700 font-extrabold text-base">{{ $paket->harga_format }}</p>
+                        </div>
+                        
+                        @auth
+                            @if(auth()->user()->isCustomer())
+                                <a href="{{ route('customer.bookings.create', $paket->id) }}" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors shadow-sm">
+                                    Pesan
+                                </a>
+                            @else
+                                <span class="text-slate-400 text-xs font-semibold bg-slate-100 px-2 py-1 rounded">Admin</span>
+                            @endif
+                        @else
+                            <a href="{{ route('customer.bookings.create', $paket->id) }}" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors shadow-sm">
+                                Pesan
+                            </a>
+                        @endauth
                     </div>
                 </div>
             </div>
-
-            {{-- Card 2 --}}
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition p-3">
-                <div class="relative h-48 rounded-xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
-                </div>
-                <div class="p-4">
-                    <div class="text-gray-400 text-xs flex items-center gap-1 mb-1"><i class="fas fa-location-dot"></i> Lombok, NTB</div>
-                    <h3 class="font-bold text-gray-900 mb-4 line-clamp-2">Gili Trawangan Escape</h3>
-                    <div class="flex justify-between items-center mt-auto">
-                        <div class="text-blue-700 font-bold text-lg">Rp 3.8Jt</div>
-                        <button class="bg-gray-100 hover:bg-gray-200 text-blue-700 text-xs font-semibold py-2 px-4 rounded-lg transition">Pesan Sekarang</button>
-                    </div>
-                </div>
+            @empty
+            <div class="col-span-full bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
+                <i class="fas fa-box-open text-4xl text-slate-300 mb-3"></i>
+                <h3 class="text-lg font-bold text-slate-800">Belum Ada Paket</h3>
+                <p class="text-sm text-slate-500 mt-1">Belum ada paket wisata populer yang tersedia saat ini.</p>
             </div>
-
-            {{-- Card 3 --}}
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition p-3">
-                <div class="relative h-48 rounded-xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1596401057633-cece5be1226c?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
-                </div>
-                <div class="p-4">
-                    <div class="text-gray-400 text-xs flex items-center gap-1 mb-1"><i class="fas fa-location-dot"></i> Yogyakarta, DIY</div>
-                    <h3 class="font-bold text-gray-900 mb-4 line-clamp-2">Heritage Borobudur Tour</h3>
-                    <div class="flex justify-between items-center mt-auto">
-                        <div class="text-blue-700 font-bold text-lg">Rp 2.2Jt</div>
-                        <button class="bg-gray-100 hover:bg-gray-200 text-blue-700 text-xs font-semibold py-2 px-4 rounded-lg transition">Pesan Sekarang</button>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Card 4 --}}
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition p-3">
-                <div class="relative h-48 rounded-xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1623058863266-4180479bc081?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
-                    <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">Hot Deal</span>
-                </div>
-                <div class="p-4">
-                    <div class="text-gray-400 text-xs flex items-center gap-1 mb-1"><i class="fas fa-location-dot"></i> Malang, Jawa Timur</div>
-                    <h3 class="font-bold text-gray-900 mb-4 line-clamp-2">Bromo Sunrise Adventure</h3>
-                    <div class="flex justify-between items-center mt-auto">
-                        <div class="text-blue-700 font-bold text-lg">Rp 1.9Jt</div>
-                        <button class="bg-gray-100 hover:bg-gray-200 text-blue-700 text-xs font-semibold py-2 px-4 rounded-lg transition">Pesan Sekarang</button>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 </section>
